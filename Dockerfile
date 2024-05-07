@@ -11,6 +11,8 @@ LABEL org.opencontainers.image.authors="${IMAGE_AUTHOR}"
 
 VOLUME /root/.pulumi
 
+RUN pip install jinja-cli
+
 RUN curl \
 --location \
 "https://github.com/muhlba91/pulumi-proxmoxve/releases/download/v${PROXMOXVE_PLUGIN_VERSION}/pulumi-resource-proxmoxve-v${PROXMOXVE_PLUGIN_VERSION}-${OS}-${ARCH}.tar.gz" \
@@ -23,3 +25,5 @@ rm --force /tmp/proxmove.tar.gz
 RUN pulumi login --local
 
 WORKDIR /projects
+
+ENTRYPOINT []
