@@ -19,7 +19,4 @@ RUN curl \
   && \
   rm --force /tmp/proxmove.tar.gz
 
-RUN pulumi login --local
-ENV PULUMI_CONFIG_PASSPHRASE=''
-
 WORKDIR /projects
