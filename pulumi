@@ -15,15 +15,15 @@ function _check_image_exist {
 function _build_image {
   local image="${1}"
   local tag="${2}"
-  local build_args="${@:3}"
+  local dockerfile_path="${3}"
+  local build_args="${@:4}"
   local build_args_string="$(for arg in ${build_args[@]}; do echo --build-arg=${arg} ; done)"
 
   [[ -f "${SCRIPT_DIR}/Dockerfile" ]] || _echo_to_stderr_and_exit_with_error "Отсутствует файл 'Dockerfile' - аварийный выход"
   sudo docker build \
   ${build_args_string} \
   --tag "${image}:${tag}" \
-  .
-
+  "${dockerfile_path}"
 }
 
 function _preflight {
@@ -31,6 +31,7 @@ function _preflight {
     _build_image \
     "${PULUMI_PROXMOXVE_YAML_DOCKER_IMAGE}" \
     "${PULUMI_PROXMOXVE_YAML_DOCKER_TAG}" \
+    "${SCRIPT_DIR}" \
     "PULUMI_VERSION=${PULUMI_VERSION}" \
     "PROXMOXVE_PLUGIN_VERSION=${PROXMOXVE_PLUGIN_VERSION}" \
     || _echo_to_stderr_and_exit_with_error "Не удалось собрать докер образ - аварийный выход"
@@ -40,16 +41,24 @@ function _preflight {
 }
 
 function _run_container {
+  local cwd_string
+
+  if $(echo ${PWD} | grep projects --quiet); then
+    cwd_string="--cwd /projects/$(basename ${PWD})"
+  else
+    cwd_string=''
+  fi
+
   docker run \
   --rm \
   --interactive \
   --tty \
   --network host \
-  --env PULUMI_CONFIG_PASSPHRASE="${PULUMI_CONFIG_PASSPHRASE}" \
-  --volume "${SCRIPT_DIR}/.pulumi:/root/.pulumi" \
+  --env "PULUMI_CONFIG_PASSPHRASE=${PULUMI_CONFIG_PASSPHRASE}" \
+  --volume pulumi_config:/root/.pulumi \
   --volume "${SCRIPT_DIR}/projects:/projects" \
   "${PULUMI_PROXMOXVE_YAML_DOCKER_IMAGE}:${PULUMI_PROXMOXVE_YAML_DOCKER_TAG}" \
-  --cwd "/projects/$(basename ${PWD})" \
+  ${cwd_string} \
   ${PULUMI_ARGS} \
   ${@}
 }
