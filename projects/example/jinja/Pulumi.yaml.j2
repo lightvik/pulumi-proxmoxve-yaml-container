@@ -1,5 +1,5 @@
 {%- from 'macros/include_with_indent.j2' import include_with_indent as include_with_indent %}
-name: example
+name: {{ env("PROJECT_NAME") }}
 runtime: yaml
 description: A minimal Pulumi YAML program
 config: { "pulumi:tags": { value: { "pulumi:template": yaml } } }

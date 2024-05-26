@@ -5,15 +5,17 @@ wip
 ```
 
 ```
-PROJECT_NAME='infra.example.com'
-PROJECT_DIRECTORY="/projects/${PROJECT_NAME}"
-PROJECT_DESCRIPTION="${PROJECT_NAME} infrastructure"
-PROJECT_ENVIRONMENT='dev'
-PROJECT_STACK="${PROJECT_NAME}-${PROJECT_ENVIRONMENT}"
+export PROJECT_NAME='infra.industrial.kz'
+export PROJECT_DIRECTORY="/projects/${PROJECT_NAME}"
+export PROJECT_DESCRIPTION="${PROJECT_NAME} - pulumi-proxmoxve"
+export PROJECT_STACK="dev"
 ```
 
-
-
+```
+pulumi stack init \
+--cwd "${PROJECT_DIRECTORY}" \
+--stack "${PROJECT_STACK}"
+```
 
 ```
 mkdir --parents "${PROJECT_DIRECTORY}" \
@@ -24,6 +26,9 @@ pulumi new yaml \
 --description "${PROJECT_DESCRIPTION}" \
 --stack "${PROJECT_STACK}"
 ```
+
+
+
 
 ```
 mkdir --parents "${PROJECT_DIRECTORY}"/files/{images,snippets,ssh_keys}
@@ -44,10 +49,23 @@ cp --recursive /projects/example/jinja "${PROJECT_DIRECTORY}"
 ```
 
 
+```
+ssh-keygen \
+-N '' \
+-C "salt-ssh" \
+-t ed25519 \
+-f "${PROJECT_DIRECTORY}/files/ssh_keys/id_ed25519"
+```
+
+```
+export SSH_PUBKEY="$(<${PROJECT_DIRECTORY}/files/ssh_keys/id_ed25519.pub)"
+( cd "${PROJECT_DIRECTORY}/jinja" && jinjanate --quiet --output-file "${PROJECT_DIRECTORY}/files/snippets/cloud-init_root_with_password_and_private_key.yaml" cloud-init_root_with_password_and_private_key.yaml.j2; )
+unset SSH_PUBKEY
+```
 
 
 
-
+создаем template vm
 
 ```
 export TEMPLATE_VM_IS_NOT_READY=true
@@ -66,6 +84,8 @@ Pulumi.yaml.j2
 sed --in-place '/^[[:space:]]*$/d' "${PROJECT_DIRECTORY}/Pulumi.yaml"
 ```
 
+
+
 ```
 pulumi up \
 --cwd "${PROJECT_DIRECTORY}" \
@@ -76,16 +96,10 @@ pulumi up \
 export TEMPLATE_VM_IS_STARTED=true
 ```
 
-
-
-```
-unset TEMPLATE_VM_IS_NOT_READY=true
-```
-
-
+включаем template машину
 
 ```
-unset TEMPLATE_VM_IS_STARTED=true
+unset TEMPLATE_VM_IS_STARTED
 ```
 
 ```
@@ -94,6 +108,17 @@ pulumi refresh \
 --cwd "${PROJECT_DIRECTORY}" \
 --stack "${PROJECT_STACK}"
 ```
+
+
+```
+unset TEMPLATE_VM_IS_NOT_READY
+```
+
+
+
+
+
+
 
 
   132  pulumi refresh --cwd "${PROJECT_DIRECTORY}" --stack "${PROJECT_STACK}"
@@ -106,21 +131,7 @@ pulumi refresh \
 
 
 
-```
-mkdir --parents "${PROJECT_DIRECTORY}" \
-&& \
-ssh-keygen \
--N '' \
--C "salt-ssh" \
--t ed25519 \
--f "${PROJECT_DIRECTORY}/files/ssh_keys/id_ed25519"
-```
 
-```
-export SSH_PUBKEY="$(<${PROJECT_DIRECTORY}/files/ssh_keys/id_ed25519.pub)"
-( cd "${PROJECT_DIRECTORY}/jinja" && jinjanate --quiet --output-file "${PROJECT_DIRECTORY}/files/snippets/cloud-init_root_with_password_and_private_key.yaml" cloud-init_root_with_password_and_private_key.yaml.j2; )
-unset SSH_PUBKEY
-```
 
 
 

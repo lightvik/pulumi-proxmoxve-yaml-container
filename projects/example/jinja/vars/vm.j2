@@ -18,7 +18,7 @@
   'dependsOn': [
     '${' ~ 'OracleLinux-R9-U4-x86_64-dvd_kickstart_iso-hyper' ~ '}',
     '${' ~ 'cloud-init_root_with_password_and_private_key_yaml' ~ '-' ~ 'hyper' ~ '}',
-    '${' ~ 'template' ~ '}'
+    '${' ~ 'template' '_' ~ network['domain'] | replace('.', '_') ~ '}'
     ],
   'ignoreChanges': []
 } %}
