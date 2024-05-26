@@ -11,7 +11,15 @@ LABEL org.opencontainers.image.authors="${IMAGE_AUTHOR}"
 
 VOLUME /root/.pulumi
 
-RUN pip install jinja-cli
+RUN apt-get update \
+&& apt install -y bash-completion \
+&& apt-get clean
+
+RUN pulumi gen-completion bash > /etc/bash_completion.d/pulumi
+
+COPY --chown=root:root --chmod=0644 .bashrc /root/.bashrc
+
+RUN pip install jinjanator
 
 RUN curl \
 --location \
