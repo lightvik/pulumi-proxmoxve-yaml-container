@@ -1,2 +1,3 @@
 /projects/*
 !/projects/example
+/pulumi-env.sh
