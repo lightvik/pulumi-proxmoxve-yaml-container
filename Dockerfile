@@ -11,9 +11,9 @@ LABEL org.opencontainers.image.authors="${IMAGE_AUTHOR}"
 
 VOLUME /root/.pulumi
 
-RUN apt-get update \
+RUN apt update \
 && apt install -y bash-completion \
-&& apt-get clean
+&& apt clean
 
 RUN pulumi gen-completion bash > /etc/bash_completion.d/pulumi
 

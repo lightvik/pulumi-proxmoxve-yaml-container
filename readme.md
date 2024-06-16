@@ -92,14 +92,10 @@ pulumi up \
 --stack "${PROJECT_STACK}"
 ```
 
-```
-export TEMPLATE_VM_IS_STARTED=true
-```
-
 включаем template машину
 
 ```
-unset TEMPLATE_VM_IS_STARTED
+export TEMPLATE_VM_IS_STARTED=true
 ```
 
 ```
@@ -108,6 +104,13 @@ pulumi refresh \
 --cwd "${PROJECT_DIRECTORY}" \
 --stack "${PROJECT_STACK}"
 ```
+
+
+```
+unset TEMPLATE_VM_IS_STARTED
+```
+
+
 
 
 ```
